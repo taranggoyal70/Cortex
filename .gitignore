@@ -5,3 +5,8 @@ node_modules
 .env.local
 *.tsbuildinfo
 drizzle/meta
+.env*
+
+# Local agent-skill tooling (not product code)
+.agents/
+skills-lock.json

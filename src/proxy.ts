@@ -19,6 +19,7 @@ const isProtectedRoute = createRouteMatcher([
   "/api/runs(.*)",
   "/api/workspaces(.*)",
   "/api/tokens(.*)",
+  "/api/export(.*)",
   "/api/slack(.*)",
 ]);
 
