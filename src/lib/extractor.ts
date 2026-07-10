@@ -19,7 +19,7 @@ import {
   type SkillBody,
 } from "@/lib/domain/skill";
 import { AppError } from "@/lib/errors";
-import { getServerEnv } from "@/lib/env";
+import { getServerEnv, requireModelToken } from "@/lib/env";
 
 const GITHUB_MODELS_BASE_URL = "https://models.github.ai/inference";
 const BATCH_TOKEN_BUDGET = 55_000; // leave headroom for prompt + output
@@ -88,7 +88,7 @@ export function packBatches(chunks: ChunkRow[]): Batch[] {
 
 function client() {
   return new OpenAI({
-    apiKey: getServerEnv().GITHUB_MODELS_TOKEN,
+    apiKey: requireModelToken(),
     baseURL: GITHUB_MODELS_BASE_URL,
   });
 }

@@ -2,12 +2,16 @@ import "server-only";
 
 import { z } from "zod";
 
+import { AppError } from "@/lib/errors";
+
 const serverSchema = z.object({
   DATABASE_URL: z.string().url(),
   CLERK_SECRET_KEY: z.string().min(1),
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
   // GitHub Models (free tier) — one app-level token with models:read.
-  GITHUB_MODELS_TOKEN: z.string().min(1),
+  // Optional at the env layer so the app boots without it; the model call
+  // sites (extractor, playground) fail cleanly when it is missing.
+  GITHUB_MODELS_TOKEN: z.string().min(1).optional(),
   KV_REST_API_URL: z.string().url().optional(),
   KV_REST_API_TOKEN: z.string().min(1).optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
@@ -53,4 +57,20 @@ export function getServerEnv(): ServerEnv {
 
   cached = result.data;
   return cached;
+}
+
+/**
+ * The GitHub Models token, or throw a clean error if it is not configured.
+ * Call this at model-request sites so the rest of the app boots without it.
+ */
+export function requireModelToken(): string {
+  const token = getServerEnv().GITHUB_MODELS_TOKEN;
+  if (!token) {
+    throw new AppError(
+      "GITHUB_MODELS_TOKEN is not configured. Add it in your environment to enable extraction and the playground.",
+      503,
+      "model_not_configured",
+    );
+  }
+  return token;
 }

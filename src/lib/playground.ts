@@ -8,7 +8,7 @@ import {
   type ScenarioResult,
   scenarioResultSchema,
 } from "@/lib/domain/skill";
-import { getServerEnv } from "@/lib/env";
+import { getServerEnv, requireModelToken } from "@/lib/env";
 import { AppError } from "@/lib/errors";
 import { getApprovedSkills } from "@/lib/skills";
 
@@ -38,7 +38,7 @@ type CompiledSkill = {
 
 function client() {
   return new OpenAI({
-    apiKey: getServerEnv().GITHUB_MODELS_TOKEN,
+    apiKey: requireModelToken(),
     baseURL: GITHUB_MODELS_BASE_URL,
   });
 }
