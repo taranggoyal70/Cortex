@@ -1,0 +1,10 @@
+.next/
+.swc/
+.vercel/
+node_modules/
+tmp/
+src/app/.well-known/workflow/
+pnpm-lock.yaml
+*.ico
+*.png
+*.jpg
