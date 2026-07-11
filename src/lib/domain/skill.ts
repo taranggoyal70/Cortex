@@ -79,9 +79,22 @@ export const skillBodySchema = z.object({
 });
 export type SkillBody = z.infer<typeof skillBodySchema>;
 
-// The model returns a batch of skills per extraction call.
+// A contradiction the model detected between two sources on the same topic.
+// Each side quotes its chunk verbatim so the server can verify it.
+export const extractionConflictSchema = z.object({
+  topic: z.string().min(3).max(160),
+  skillSlug: z.string().max(80).nullable(),
+  detail: z.string().min(3).max(300),
+  sideA: skillCitationRef,
+  sideB: skillCitationRef,
+});
+export type ExtractionConflict = z.infer<typeof extractionConflictSchema>;
+
+// The model returns a batch of skills per extraction call, plus any
+// cross-source contradictions it noticed while reading the chunks.
 export const extractionBatchSchema = z.object({
   skills: z.array(skillBodySchema).max(15),
+  conflicts: z.array(extractionConflictSchema).max(10),
 });
 export type ExtractionBatch = z.infer<typeof extractionBatchSchema>;
 

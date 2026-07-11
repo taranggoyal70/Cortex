@@ -72,11 +72,15 @@ async function main() {
 
   console.log("→ extracting skills (GitHub Models)");
   const candidates = [];
+  const modelConflicts = [];
   for (let i = 0; i < batches.length; i++) {
     const result = await extractBatch(batches[i]);
     if (result.ok) {
       candidates.push(...result.skills);
-      console.log(`   batch ${i + 1}/${batches.length}: ${result.skills.length} verified skill(s)`);
+      modelConflicts.push(...result.conflicts);
+      console.log(
+        `   batch ${i + 1}/${batches.length}: ${result.skills.length} verified skill(s), ${result.conflicts.length} conflict(s)`,
+      );
     } else {
       console.log(`   batch ${i + 1}/${batches.length}: FAILED (${result.reason})`);
     }
@@ -89,6 +93,7 @@ async function main() {
     createdBy: USER,
     candidates,
     chunkToSource,
+    modelConflicts,
   });
   console.log(`   proposed skills: ${merged.proposedSkillCount}, conflicts: ${merged.conflictCount}`);
 
@@ -102,11 +107,20 @@ async function main() {
   }
 
   const conflictRows = await db
-    .select({ kind: conflicts.kind, summary: conflicts.summary })
+    .select({
+      kind: conflicts.kind,
+      summary: conflicts.summary,
+      sideA: conflicts.sideA,
+      sideB: conflicts.sideB,
+    })
     .from(conflicts)
     .where(eq(conflicts.workspaceId, WS));
   console.log("\n=== CONFLICTS (sources disagreeing) ===");
-  for (const c of conflictRows) console.log(`• [${c.kind}] ${c.summary}`);
+  for (const c of conflictRows) {
+    console.log(`• [${c.kind}] ${c.summary}`);
+    if (c.sideA?.quote) console.log(`    A: "${c.sideA.quote}"`);
+    if (c.sideB?.quote) console.log(`    B: "${c.sideB.quote}"`);
+  }
 
   // Approve the refund skill so the playground can use it.
   const refund = skillRows.find((s) => /refund/i.test(s.slug) || /refund/i.test(s.name));

@@ -1,6 +1,7 @@
 import "server-only";
 
 import OpenAI from "openai";
+import { LengthFinishReasonError } from "openai/error";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { and, eq, inArray } from "drizzle-orm";
 
@@ -16,6 +17,7 @@ import {
 import { reserveModelCall } from "@/lib/budget";
 import {
   extractionBatchSchema,
+  type ExtractionConflict,
   type SkillBody,
 } from "@/lib/domain/skill";
 import { AppError } from "@/lib/errors";
@@ -36,7 +38,9 @@ Rules:
 - Guardrails: severity "must" for hard constraints ("never refund a disputed charge"), "should" for soft ones.
 - Set confidence honestly (0-1). Use extractorNotes for assumptions or gaps.
 - slug: short, lowercase, hyphenated, stable (e.g. "refund-handling").
-- Do not invent policy, numbers, owners, or steps that the chunks do not support.`;
+- Do not invent policy, numbers, owners, or steps that the chunks do not support.
+
+CONFLICTS — this is important: when two chunks give DIFFERENT guidance on the same thing (e.g. one says a 30-day refund window, another says 45 days; one owner vs another; conflicting thresholds or steps), you MUST report it in "conflicts". Do NOT silently pick one and merge it away. For each conflict give the topic, an optional related skillSlug, a short detail, and sideA/sideB each quoting its chunk VERBATIM with its chunkId. Still produce the best single skill, but surface the disagreement so a human can resolve it. If there are no genuine contradictions, return an empty conflicts array.`;
 
 export type ChunkRow = {
   id: string;
@@ -133,8 +137,30 @@ function verifyCitations(batch: Batch, skillsOut: SkillBody[]): SkillBody[] {
   return result;
 }
 
+/**
+ * Keep only conflicts whose BOTH sides quote their cited chunk verbatim — the
+ * same anti-hallucination gate applied to citations.
+ */
+function verifyConflicts(
+  batch: Batch,
+  reported: ExtractionConflict[],
+): ExtractionConflict[] {
+  const chunkText = new Map(batch.map((c) => [c.id, normalize(c.text)]));
+  const validSide = (chunkId: string, quote: string) => {
+    const text = chunkText.get(chunkId);
+    return text ? text.includes(normalize(quote)) : false;
+  };
+  return reported.filter(
+    (c) =>
+      validSide(c.sideA.chunkId, c.sideA.quote) &&
+      validSide(c.sideB.chunkId, c.sideB.quote) &&
+      // A real conflict has two distinct sides.
+      normalize(c.sideA.quote) !== normalize(c.sideB.quote),
+  );
+}
+
 export type ExtractBatchResult =
-  | { ok: true; skills: SkillBody[] }
+  | { ok: true; skills: SkillBody[]; conflicts: ExtractionConflict[] }
   | { ok: false; reason: "budget" | "rate_limit" | "empty" };
 
 /** One model call over one batch → verified candidate skills. */
@@ -158,10 +184,15 @@ export async function extractBatch(batch: Batch): Promise<ExtractBatchResult> {
           content: `Extract skills from these chunks. Cite chunkIds with verbatim quotes.\n\n${chunkPayload}`,
         },
       ],
-      max_tokens: 8_000,
+      max_tokens: 16_000,
       response_format: zodResponseFormat(extractionBatchSchema, "skills"),
     });
   } catch (error) {
+    // The model ran out of output budget mid-object — treat as a soft empty
+    // rather than crashing the run.
+    if (error instanceof LengthFinishReasonError) {
+      return { ok: false, reason: "empty" };
+    }
     if (error instanceof OpenAI.APIError) {
       if (error.status === 429) return { ok: false, reason: "rate_limit" };
       if (error.status === 401 || error.status === 403) {
@@ -182,7 +213,11 @@ export async function extractBatch(batch: Batch): Promise<ExtractBatchResult> {
 
   const parsed = completion.choices[0]?.message.parsed;
   if (!parsed) return { ok: false, reason: "empty" };
-  return { ok: true, skills: verifyCitations(batch, parsed.skills) };
+  return {
+    ok: true,
+    skills: verifyCitations(batch, parsed.skills),
+    conflicts: verifyConflicts(batch, parsed.conflicts),
+  };
 }
 
 // ── Merge + persist ───────────────────────────────────────────────────────────
@@ -213,9 +248,33 @@ export async function mergeAndPersist(input: {
   createdBy: string;
   candidates: SkillBody[];
   chunkToSource: Map<string, string>;
+  modelConflicts?: ExtractionConflict[];
 }) {
   const db = getDb();
   const env = getServerEnv();
+
+  // Persist contradictions the model surfaced across sources (already
+  // verbatim-verified), each side carrying its quote and source.
+  let modelConflictCount = 0;
+  for (const c of input.modelConflicts ?? []) {
+    await db.insert(conflicts).values({
+      workspaceId: input.workspaceId,
+      kind: "contradiction",
+      summary: `${c.topic}: ${c.detail}`,
+      detectedByRunId: input.runId,
+      sideA: {
+        quote: c.sideA.quote,
+        chunkId: c.sideA.chunkId,
+        sourceId: input.chunkToSource.get(c.sideA.chunkId),
+      },
+      sideB: {
+        quote: c.sideB.quote,
+        chunkId: c.sideB.chunkId,
+        sourceId: input.chunkToSource.get(c.sideB.chunkId),
+      },
+    });
+    modelConflictCount += 1;
+  }
 
   // Group by slug; keep the highest-confidence candidate as the base and
   // union its cited claims with same-slug siblings.
@@ -367,7 +426,7 @@ export async function mergeAndPersist(input: {
     proposedSkillCount += 1;
   }
 
-  return { proposedSkillCount, conflictCount };
+  return { proposedSkillCount, conflictCount: conflictCount + modelConflictCount };
 }
 
 export async function markSourcesExtracted(

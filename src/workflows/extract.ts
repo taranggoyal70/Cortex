@@ -1,4 +1,4 @@
-import type { SkillBody } from "@/lib/domain/skill";
+import type { ExtractionConflict, SkillBody } from "@/lib/domain/skill";
 import {
   extractBatch,
   loadChunksForSources,
@@ -37,9 +37,17 @@ async function extractBatchStep(input: {
   const result = await extractBatch(input.batch);
   await updateRun(input.runId, { batchesDone: input.index + 1 });
   if (!result.ok) {
-    return { skills: [] as SkillBody[], stopped: result.reason };
+    return {
+      skills: [] as SkillBody[],
+      conflicts: [] as ExtractionConflict[],
+      stopped: result.reason,
+    };
   }
-  return { skills: result.skills, stopped: null as string | null };
+  return {
+    skills: result.skills,
+    conflicts: result.conflicts,
+    stopped: null as string | null,
+  };
 }
 
 async function persistStep(input: {
@@ -48,6 +56,7 @@ async function persistStep(input: {
   createdBy: string;
   sourceIds: string[];
   candidates: SkillBody[];
+  modelConflicts: ExtractionConflict[];
   chunkToSource: (readonly [string, string])[];
   partial: boolean;
   callsUsed: number;
@@ -61,6 +70,7 @@ async function persistStep(input: {
     createdBy: input.createdBy,
     candidates: input.candidates,
     chunkToSource,
+    modelConflicts: input.modelConflicts,
   });
 
   await markSourcesExtracted(input.workspaceId, input.sourceIds);
@@ -96,6 +106,7 @@ export async function extractWorkflow(input: WorkflowInput) {
       await persistStep({
         ...input,
         candidates: [],
+        modelConflicts: [],
         chunkToSource,
         partial: false,
         callsUsed: 0,
@@ -104,6 +115,7 @@ export async function extractWorkflow(input: WorkflowInput) {
     }
 
     const candidates: SkillBody[] = [];
+    const modelConflicts: ExtractionConflict[] = [];
     let partial = false;
     let callsUsed = 0;
     for (let i = 0; i < batches.length; i += 1) {
@@ -113,6 +125,7 @@ export async function extractWorkflow(input: WorkflowInput) {
         index: i,
       });
       candidates.push(...result.skills);
+      modelConflicts.push(...result.conflicts);
       if (result.stopped === "budget" || result.stopped === "rate_limit") {
         partial = true;
         break;
@@ -123,6 +136,7 @@ export async function extractWorkflow(input: WorkflowInput) {
     return await persistStep({
       ...input,
       candidates,
+      modelConflicts,
       chunkToSource,
       partial,
       callsUsed,
