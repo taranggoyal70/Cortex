@@ -45,7 +45,7 @@ export default async function SkillsPage() {
           </p>
           <Link
             href={"/sources" as Route}
-            className="mt-4 inline-flex rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink"
+            className="mt-4 inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
           >
             Add sources
           </Link>
@@ -62,7 +62,7 @@ export default async function SkillsPage() {
                 <CategoryBadge category={skill.category} />
                 <StatusBadge status={skill.status} />
               </div>
-              <h2 className="font-semibold leading-snug text-paper group-hover:text-violet-light">
+              <h2 className="font-semibold leading-snug text-paper group-hover:text-accent-light">
                 {skill.name}
               </h2>
               <p className="mt-1 font-mono text-[11px] text-muted">{skill.slug}</p>

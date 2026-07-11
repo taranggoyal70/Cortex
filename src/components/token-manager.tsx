@@ -73,12 +73,12 @@ export function TokenManager({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Token name (e.g. Production agent)"
-            className="flex-1 rounded-lg border border-line-strong bg-ink px-3 py-2 text-sm text-paper placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-violet"
+            className="flex-1 rounded-lg border border-line-strong bg-ink px-3 py-2 text-sm text-paper placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
           />
           <button
             type="submit"
             disabled={pending || !name.trim()}
-            className="inline-flex items-center gap-2 rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink disabled:opacity-50"
           >
             <KeyIcon size={15} weight="fill" />
             Create token
@@ -87,8 +87,8 @@ export function TokenManager({
       )}
 
       {freshToken && (
-        <div className="mb-6 rounded-lg border border-mint/30 bg-mint/10 p-4">
-          <p className="text-xs font-semibold text-mint">
+        <div className="mb-6 rounded-lg border border-success/30 bg-success/10 p-4">
+          <p className="text-xs font-semibold text-success">
             Copy this token now — it won&apos;t be shown again.
           </p>
           <div className="mt-2 flex items-center gap-2">

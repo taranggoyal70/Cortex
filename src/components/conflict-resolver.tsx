@@ -64,7 +64,7 @@ export function ConflictResolver({
             type="button"
             disabled={pending}
             onClick={() => act("resolved")}
-            className="rounded-lg bg-violet px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-violet-light hover:text-ink disabled:opacity-50"
+            className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-accent-light hover:text-ink disabled:opacity-50"
           >
             Mark resolved
           </button>

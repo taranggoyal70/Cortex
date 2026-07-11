@@ -35,7 +35,7 @@ export function ExtractButton() {
       type="button"
       onClick={run}
       disabled={pending}
-      className="inline-flex items-center gap-2 rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink disabled:opacity-50"
+      className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink disabled:opacity-50"
     >
       {pending ? (
         <CircleNotchIcon size={15} className="animate-spin" />

@@ -45,7 +45,7 @@ export default async function PlaygroundPage() {
           </p>
           <Link
             href={"/review" as Route}
-            className="mt-4 inline-flex rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink"
+            className="mt-4 inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
           >
             Go to Review
           </Link>

@@ -47,7 +47,7 @@ export default async function DashboardPage() {
         </div>
         <Link
           href={"/sources" as Route}
-          className="inline-flex items-center gap-2 rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
         >
           Add sources
           <ArrowRightIcon size={15} weight="bold" />
@@ -72,15 +72,15 @@ export default async function DashboardPage() {
           <h2 className="text-lg font-semibold text-paper">Get started</h2>
           <ol className="mt-4 space-y-3 text-sm text-muted-light">
             <li className="flex gap-3">
-              <FilesIcon size={18} className="mt-0.5 shrink-0 text-violet-light" />
+              <FilesIcon size={18} className="mt-0.5 shrink-0 text-accent-light" />
               Add sources — paste text, upload files, or load the sample company.
             </li>
             <li className="flex gap-3">
-              <SquaresFourIcon size={18} className="mt-0.5 shrink-0 text-violet-light" />
+              <SquaresFourIcon size={18} className="mt-0.5 shrink-0 text-accent-light" />
               Run extraction to turn them into cited, reviewable skills.
             </li>
             <li className="flex gap-3">
-              <WarningCircleIcon size={18} className="mt-0.5 shrink-0 text-violet-light" />
+              <WarningCircleIcon size={18} className="mt-0.5 shrink-0 text-accent-light" />
               Approve skills, then export the file your agents can run.
             </li>
           </ol>

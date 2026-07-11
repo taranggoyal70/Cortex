@@ -65,7 +65,7 @@ export function AppSidebar() {
             className={cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition",
               isActive(item.href)
-                ? "bg-violet/10 text-paper ring-1 ring-inset ring-violet/20"
+                ? "bg-accent/10 text-paper ring-1 ring-inset ring-accent/20"
                 : "text-muted-light hover:bg-white/[0.035] hover:text-paper",
             )}
           >
@@ -84,7 +84,7 @@ export function AppSidebar() {
             className={cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition",
               isActive(item.href)
-                ? "bg-violet/10 text-paper ring-1 ring-inset ring-violet/20"
+                ? "bg-accent/10 text-paper ring-1 ring-inset ring-accent/20"
                 : "text-muted-light hover:bg-white/[0.035] hover:text-paper",
             )}
           >

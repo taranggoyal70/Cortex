@@ -78,7 +78,7 @@ export function ScenarioRunner({ examples }: { examples?: string[] }) {
           onChange={(e) => setScenario(e.target.value)}
           rows={3}
           placeholder="Describe a real situation your team faces…"
-          className="w-full resize-none rounded-xl border border-line-strong bg-ink px-4 py-3 text-sm text-paper placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-violet"
+          className="w-full resize-none rounded-xl border border-line-strong bg-ink px-4 py-3 text-sm text-paper placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
         />
         <div className="mt-3 flex items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2">
@@ -99,7 +99,7 @@ export function ScenarioRunner({ examples }: { examples?: string[] }) {
           <button
             type="submit"
             disabled={pending || scenario.trim().length < 4}
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink disabled:opacity-50"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink disabled:opacity-50"
           >
             {pending ? "Running…" : "Run it"}
             {!pending && <ArrowRightIcon size={15} weight="bold" />}
@@ -116,7 +116,7 @@ export function ScenarioRunner({ examples }: { examples?: string[] }) {
                 Defers to a human
               </span>
             ) : result.matched ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-mint/15 px-2.5 py-1 text-xs font-semibold text-mint">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-2.5 py-1 text-xs font-semibold text-success">
                 <SealCheckIcon size={13} weight="fill" />
                 Matched skill
               </span>
@@ -126,7 +126,7 @@ export function ScenarioRunner({ examples }: { examples?: string[] }) {
               </span>
             )}
             {result.chosenSkillSlug && (
-              <code className="font-mono text-xs text-violet-light">
+              <code className="font-mono text-xs text-accent-light">
                 {result.chosenSkillSlug}
               </code>
             )}
@@ -170,7 +170,7 @@ export function ScenarioRunner({ examples }: { examples?: string[] }) {
                     <CheckCircleIcon
                       size={15}
                       weight="fill"
-                      className="mt-0.5 shrink-0 text-mint"
+                      className="mt-0.5 shrink-0 text-success"
                     />
                     {r}
                   </li>
@@ -205,7 +205,7 @@ export function ScenarioRunner({ examples }: { examples?: string[] }) {
                 {result.citations.map((c, i) => (
                   <li
                     key={i}
-                    className="rounded-lg border-l-2 border-violet/50 bg-ink px-3 py-2"
+                    className="rounded-lg border-l-2 border-accent/50 bg-ink px-3 py-2"
                   >
                     <p className="text-sm italic text-paper">“{c.quote}”</p>
                     <p className="mt-1 font-mono text-[10px] text-muted">

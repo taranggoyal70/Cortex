@@ -5,7 +5,7 @@ export function CreateWorkspacePrompt() {
   return (
     <main className="grid min-h-screen place-items-center px-6 py-16">
       <div className="flex max-w-md flex-col items-center text-center">
-        <BrainIcon size={40} weight="duotone" className="text-violet-light" />
+        <BrainIcon size={40} weight="duotone" className="text-accent-light" />
         <h1 className="mt-5 text-2xl font-semibold text-paper">
           Create your company workspace
         </h1>

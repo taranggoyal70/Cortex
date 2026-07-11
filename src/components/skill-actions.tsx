@@ -102,14 +102,14 @@ export function SkillActions({
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           rows={20}
-          className="w-full resize-y rounded-lg border border-line-strong bg-ink px-3 py-2 font-mono text-xs text-paper focus:outline-none focus:ring-1 focus:ring-violet"
+          className="w-full resize-y rounded-lg border border-line-strong bg-ink px-3 py-2 font-mono text-xs text-paper focus:outline-none focus:ring-1 focus:ring-accent"
         />
         <div className="mt-3 flex gap-2">
           <button
             type="button"
             onClick={saveEdit}
             disabled={pending}
-            className="rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink disabled:opacity-50"
+            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink disabled:opacity-50"
           >
             Save version
           </button>
@@ -132,7 +132,7 @@ export function SkillActions({
           type="button"
           onClick={approve}
           disabled={pending}
-          className="inline-flex items-center gap-2 rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink disabled:opacity-50"
         >
           <CheckCircleIcon size={15} weight="fill" />
           Approve

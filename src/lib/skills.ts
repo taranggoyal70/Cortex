@@ -176,6 +176,18 @@ export async function saveSkillEdit(input: {
   const nextVersion =
     existing.reduce((max, v) => Math.max(max, v.version), 0) + 1;
 
+  // Supersede whatever version was approved before adding the new one, so the
+  // skill never has two approved versions regardless of which one was current.
+  await db
+    .update(skillVersions)
+    .set({ state: "superseded" })
+    .where(
+      and(
+        eq(skillVersions.skillId, input.skillId),
+        eq(skillVersions.state, "approved"),
+      ),
+    );
+
   // A human edit creates a new approved version — it becomes the current one.
   const [version] = await db
     .insert(skillVersions)
@@ -190,17 +202,6 @@ export async function saveSkillEdit(input: {
       approvedAt: new Date(),
     })
     .returning();
-
-  await db
-    .update(skillVersions)
-    .set({ state: "superseded" })
-    .where(
-      and(
-        eq(skillVersions.skillId, input.skillId),
-        eq(skillVersions.state, "approved"),
-        eq(skillVersions.version, skill.currentVersionId ? nextVersion - 1 : -1),
-      ),
-    );
 
   await db
     .update(skills)

@@ -50,7 +50,7 @@ export function ExportPanel({ appUrl }: { appUrl: string }) {
               onClick={() => setFormat(f.key)}
               className={`w-full rounded-lg border p-3 text-left transition ${
                 format === f.key
-                  ? "border-violet bg-violet/10"
+                  ? "border-accent bg-accent/10"
                   : "border-line hover:border-line-strong"
               }`}
             >
@@ -62,7 +62,7 @@ export function ExportPanel({ appUrl }: { appUrl: string }) {
 
         <a
           href={`/api/export?format=${format}&download=1`}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
         >
           <DownloadSimpleIcon size={15} weight="bold" />
           Download {FORMATS.find((f) => f.key === format)?.label}

@@ -66,7 +66,7 @@ export default async function HomePage() {
       </nav>
 
       <section className="mx-auto max-w-[1180px] px-6 pb-16 pt-20 lg:pt-28">
-        <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet/30 bg-violet/10 px-3 py-1.5 text-xs font-medium text-violet-light">
+        <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent-light">
           <BrainIcon size={14} weight="fill" />
           The missing layer for AI automation
         </p>
@@ -84,7 +84,7 @@ export default async function HomePage() {
         <div className="mt-9 flex flex-wrap gap-3">
           <Link
             href={"/sign-up" as Route}
-            className="inline-flex items-center gap-2 rounded-lg bg-violet px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink"
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
           >
             Build your company brain
             <ArrowRightIcon size={16} weight="bold" />
@@ -94,7 +94,7 @@ export default async function HomePage() {
         <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-line-strong bg-line-strong sm:grid-cols-2 lg:grid-cols-4">
           {features.map((feature) => (
             <div key={feature.title} className="bg-surface p-6">
-              <feature.icon size={22} weight="duotone" className="mb-6 text-violet-light" />
+              <feature.icon size={22} weight="duotone" className="mb-6 text-accent-light" />
               <h2 className="text-sm font-semibold text-paper">{feature.title}</h2>
               <p className="mt-2 text-sm leading-6 text-muted">{feature.body}</p>
             </div>

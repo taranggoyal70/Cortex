@@ -9,8 +9,13 @@ export type ApprovedSkill = {
   citations: { claimPath: string; quote: string; sourceTitle: string | null }[];
 };
 
-function yamlEscape(value: string) {
-  return value.replace(/"/g, '\\"');
+/** Wrap a string as a safe double-quoted YAML scalar. */
+function yamlQuote(value: string) {
+  const escaped = value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n");
+  return `"${escaped}"`;
 }
 
 /** One skill as a Claude Agent-Skill style SKILL.md section. */
@@ -19,9 +24,9 @@ function skillToMarkdown(skill: ApprovedSkill): string {
   const lines: string[] = [];
   lines.push("---");
   lines.push(`name: ${b.slug}`);
-  lines.push(`description: ${yamlEscape(b.whenToUse)}`);
+  lines.push(`description: ${yamlQuote(b.whenToUse)}`);
   lines.push(`category: ${b.category}`);
-  if (b.owners.length) lines.push(`owners: [${b.owners.map((o) => `"${yamlEscape(o)}"`).join(", ")}]`);
+  if (b.owners.length) lines.push(`owners: [${b.owners.map(yamlQuote).join(", ")}]`);
   lines.push(`confidence: ${b.confidence}`);
   lines.push(`version: ${skill.version}`);
   lines.push("source: Cortex — the company brain");
@@ -131,7 +136,7 @@ function jsonToYaml(value: unknown, indent = 0): string {
 function scalar(v: unknown): string {
   if (v === null) return "null";
   if (typeof v === "string") {
-    return /[:#\-?[\]{}\n"]/.test(v) ? `"${v.replace(/"/g, '\\"')}"` : v;
+    return /[:#\-?[\]{}\n"\\]/.test(v) || v === "" ? yamlQuote(v) : v;
   }
   return String(v);
 }

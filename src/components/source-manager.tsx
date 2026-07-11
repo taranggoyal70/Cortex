@@ -173,7 +173,7 @@ export function SourceManager({
             type="button"
             onClick={seed}
             disabled={pending}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-violet/40 bg-violet/10 px-4 py-2.5 text-sm font-medium text-violet-light transition hover:bg-violet/20 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-medium text-accent-light transition hover:bg-accent/20 disabled:opacity-50"
           >
             <SparkleIcon size={16} weight="fill" />
             Load sample company
@@ -191,19 +191,19 @@ export function SourceManager({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title (e.g. Refund policy)"
-            className="mb-2 w-full rounded-lg border border-line-strong bg-ink px-3 py-2 text-sm text-paper placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-violet"
+            className="mb-2 w-full rounded-lg border border-line-strong bg-ink px-3 py-2 text-sm text-paper placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
           />
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Paste a doc, Slack thread, ticket, or transcript…"
             rows={6}
-            className="mb-3 w-full resize-y rounded-lg border border-line-strong bg-ink px-3 py-2 text-sm text-paper placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-violet"
+            className="mb-3 w-full resize-y rounded-lg border border-line-strong bg-ink px-3 py-2 text-sm text-paper placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
           />
           <button
             type="submit"
             disabled={pending || !title.trim() || !content.trim()}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink disabled:opacity-50"
           >
             <UploadSimpleIcon size={15} weight="bold" />
             Add source

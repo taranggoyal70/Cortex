@@ -29,7 +29,7 @@ function CiteChips({
         <span
           key={`${c.chunkId}-${i}`}
           title={c.quote}
-          className="inline-flex cursor-help items-center rounded border border-violet/30 bg-violet/10 px-1.5 py-px font-mono text-[9px] text-violet-light"
+          className="inline-flex cursor-help items-center rounded border border-accent/30 bg-accent/10 px-1.5 py-px font-mono text-[9px] text-accent-light"
         >
           cite
         </span>

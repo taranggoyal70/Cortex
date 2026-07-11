@@ -55,13 +55,13 @@ export function RunProgress({ initialRun }: { initialRun: Run }) {
     <div className="rounded-xl border border-line bg-surface p-6">
       <div className="flex items-center gap-3">
         {run.status === "completed" ? (
-          <CheckCircleIcon size={22} weight="fill" className="text-mint" />
+          <CheckCircleIcon size={22} weight="fill" className="text-success" />
         ) : run.status === "failed" ? (
           <XCircleIcon size={22} weight="fill" className="text-danger" />
         ) : run.status === "partial" ? (
           <WarningCircleIcon size={22} weight="fill" className="text-amber" />
         ) : (
-          <CircleNotchIcon size={22} className="animate-spin text-violet-light" />
+          <CircleNotchIcon size={22} className="animate-spin text-accent-light" />
         )}
         <div>
           <p className="font-semibold text-paper">
@@ -82,7 +82,7 @@ export function RunProgress({ initialRun }: { initialRun: Run }) {
 
       <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/5">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-violet to-mint transition-all"
+          className="h-full rounded-full bg-gradient-to-r from-accent to-success transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -113,7 +113,7 @@ export function RunProgress({ initialRun }: { initialRun: Run }) {
       {!active && run.status !== "failed" && (
         <Link
           href={"/review" as Route}
-          className="mt-6 inline-flex rounded-lg bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-light hover:text-ink"
+          className="mt-6 inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
         >
           Review the skills →
         </Link>

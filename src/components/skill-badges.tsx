@@ -4,7 +4,7 @@ const categoryColor: Record<string, string> = {
   support: "text-sky-300 border-sky-400/30 bg-sky-400/10",
   sales: "text-emerald-300 border-emerald-400/30 bg-emerald-400/10",
   finance: "text-amber border-amber/30 bg-amber/10",
-  engineering: "text-violet-light border-violet/30 bg-violet/10",
+  engineering: "text-accent-light border-accent/30 bg-accent/10",
   hr: "text-pink-300 border-pink-400/30 bg-pink-400/10",
   legal: "text-indigo-300 border-indigo-400/30 bg-indigo-400/10",
   ops: "text-teal-300 border-teal-400/30 bg-teal-400/10",
@@ -27,7 +27,7 @@ export function CategoryBadge({ category }: { category: string }) {
 
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    approved: "text-mint border-mint/25 bg-mint/10",
+    approved: "text-success border-success/25 bg-success/10",
     proposed: "text-amber border-amber/25 bg-amber/10",
     archived: "text-muted border-line-strong bg-white/5",
   };
@@ -51,7 +51,7 @@ export function ConfidenceBar({ value }: { value: number }) {
         <div
           className={cn(
             "h-full rounded-full",
-            pct >= 75 ? "bg-mint" : pct >= 50 ? "bg-amber" : "bg-danger",
+            pct >= 75 ? "bg-success" : pct >= 50 ? "bg-amber" : "bg-danger",
           )}
           style={{ width: `${pct}%` }}
         />

@@ -15,7 +15,7 @@ export function Brand({
       className={cn("inline-flex items-center gap-2.5 text-paper", className)}
       aria-label="Cortex home"
     >
-      <span className="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-violet to-mint text-sm font-black text-ink">
+      <span className="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-accent to-success text-sm font-black text-ink">
         C
       </span>
       {!compact && (
