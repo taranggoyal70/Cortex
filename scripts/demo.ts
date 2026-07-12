@@ -19,7 +19,8 @@ import {
 } from "@/lib/extractor";
 import { createRun } from "@/lib/runs";
 import { seedSampleCompany } from "@/lib/seed";
-import { approveSkillVersion, getApprovedSkills } from "@/lib/skills";
+import { skillLifecycle } from "@/lib/skill-lifecycle-db";
+import { getApprovedSkills } from "@/lib/skills";
 import { runScenario } from "@/lib/playground";
 
 const WS = "ws_demo_headless";
@@ -90,7 +91,6 @@ async function main() {
   const merged = await mergeAndPersist({
     workspaceId: WS,
     runId: run.id,
-    createdBy: USER,
     candidates,
     chunkToSource,
     modelConflicts,
@@ -130,7 +130,12 @@ async function main() {
       .from(skillVersions)
       .where(and(eq(skillVersions.skillId, refund.id), eq(skillVersions.workspaceId, WS)))
       .limit(1);
-    await approveSkillVersion({ workspaceId: WS, userId: USER, skillId: refund.id, versionId: ver.id });
+    await skillLifecycle.approve({
+      workspaceId: WS,
+      userId: USER,
+      skillId: refund.id,
+      versionId: ver.id,
+    });
     console.log(`\n→ approved "${refund.name}" for playground`);
   }
 

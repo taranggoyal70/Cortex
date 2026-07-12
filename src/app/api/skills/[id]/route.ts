@@ -1,8 +1,7 @@
-import { recordAuditEvent } from "@/lib/audit";
 import { requireWorkspaceAdmin } from "@/lib/auth";
 import { editSkillSchema } from "@/lib/domain/skill";
 import { toErrorResponse } from "@/lib/errors";
-import { archiveSkill, saveSkillEdit } from "@/lib/skills";
+import { skillLifecycle } from "@/lib/skill-lifecycle-db";
 
 export async function PATCH(
   request: Request,
@@ -12,21 +11,13 @@ export async function PATCH(
     const ctx = await requireWorkspaceAdmin();
     const { id } = await context.params;
     const { body } = editSkillSchema.parse(await request.json());
-    const version = await saveSkillEdit({
+    const version = await skillLifecycle.edit({
       workspaceId: ctx.workspaceId,
       userId: ctx.userId,
       skillId: id,
       body,
     });
-    await recordAuditEvent({
-      workspaceId: ctx.workspaceId,
-      userId: ctx.userId,
-      action: "skill.edited",
-      resourceType: "skill",
-      resourceId: id,
-      metadata: { versionId: version.id },
-    });
-    return Response.json({ ok: true, versionId: version.id });
+    return Response.json({ ok: true, versionId: version.versionId });
   } catch (error) {
     return toErrorResponse(error);
   }
@@ -39,13 +30,10 @@ export async function DELETE(
   try {
     const ctx = await requireWorkspaceAdmin();
     const { id } = await context.params;
-    await archiveSkill(ctx.workspaceId, id);
-    await recordAuditEvent({
+    await skillLifecycle.archive({
       workspaceId: ctx.workspaceId,
       userId: ctx.userId,
-      action: "skill.archived",
-      resourceType: "skill",
-      resourceId: id,
+      skillId: id,
     });
     return new Response(null, { status: 204 });
   } catch (error) {

@@ -52,7 +52,7 @@ export async function compileSkillsForAgent(
     slug: r.body.slug,
     name: r.body.name,
     whenToUse: r.body.whenToUse,
-    triggers: r.body.triggers,
+    triggers: r.body.triggers.map((trigger) => trigger.phrase),
     steps: r.body.steps.map((s) => s.instruction),
     decisionRules: r.body.decisionRules.map((d) => ({
       condition: d.condition,

@@ -43,7 +43,6 @@ export async function POST() {
       {
         workspaceId: ctx.workspaceId,
         runId: run.id,
-        createdBy: ctx.userId,
         sourceIds,
       },
     ]);

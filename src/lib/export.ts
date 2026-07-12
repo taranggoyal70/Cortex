@@ -26,7 +26,10 @@ function skillToMarkdown(skill: ApprovedSkill): string {
   lines.push(`name: ${b.slug}`);
   lines.push(`description: ${yamlQuote(b.whenToUse)}`);
   lines.push(`category: ${b.category}`);
-  if (b.owners.length) lines.push(`owners: [${b.owners.map(yamlQuote).join(", ")}]`);
+  if (b.owners.length)
+    lines.push(
+      `owners: [${b.owners.map((owner) => yamlQuote(owner.name)).join(", ")}]`,
+    );
   lines.push(`confidence: ${b.confidence}`);
   lines.push(`version: ${skill.version}`);
   lines.push("source: Cortex — the company brain");
@@ -39,7 +42,7 @@ function skillToMarkdown(skill: ApprovedSkill): string {
   if (b.triggers.length) {
     lines.push("");
     lines.push("## Triggers");
-    for (const t of b.triggers) lines.push(`- ${t}`);
+    for (const trigger of b.triggers) lines.push(`- ${trigger.phrase}`);
   }
   lines.push("");
   lines.push("## Steps");

@@ -41,16 +41,20 @@ function CiteChips({
 export function SkillView({ body }: { body: SkillBody }) {
   return (
     <div>
-      <p className="text-sm leading-6 text-muted-light">{body.whenToUse}</p>
+      <p className="text-sm leading-6 text-muted-light">
+        {body.whenToUse}
+        <CiteChips citations={body.whenToUseCitations} />
+      </p>
 
       {body.triggers.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {body.triggers.map((t) => (
+          {body.triggers.map((trigger) => (
             <span
-              key={t}
+              key={trigger.phrase}
               className="rounded-md border border-line bg-white/5 px-2 py-0.5 text-xs text-muted-light"
             >
-              {t}
+              {trigger.phrase}
+              <CiteChips citations={trigger.citations} />
             </span>
           ))}
         </div>
@@ -126,7 +130,14 @@ export function SkillView({ body }: { body: SkillBody }) {
 
       {body.owners.length > 0 && (
         <Section title="Owners">
-          <p className="text-sm text-muted-light">{body.owners.join(", ")}</p>
+          <ul className="space-y-1 text-sm text-muted-light">
+            {body.owners.map((owner) => (
+              <li key={owner.name}>
+                {owner.name}
+                <CiteChips citations={owner.citations} />
+              </li>
+            ))}
+          </ul>
         </Section>
       )}
 

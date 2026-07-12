@@ -51,7 +51,6 @@ export async function POST(request: Request) {
       {
         workspaceId: ctx.workspaceId,
         runId: run.id,
-        createdBy: ctx.userId,
         sourceIds: [sourceId],
       },
     ]);

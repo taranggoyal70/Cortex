@@ -11,6 +11,16 @@ export const skillCitationRef = z.object({
 });
 export type SkillCitationRef = z.infer<typeof skillCitationRef>;
 
+const skillTrigger = z.object({
+  phrase: z.string().min(3).max(160),
+  citations: z.array(skillCitationRef).max(4),
+});
+
+const skillOwner = z.object({
+  name: z.string().max(120),
+  citations: z.array(skillCitationRef).max(4),
+});
+
 export const skillCategory = z.enum([
   "support",
   "sales",
@@ -35,7 +45,8 @@ export const skillBodySchema = z.object({
   category: skillCategory,
   // The trigger an agent matches a scenario against.
   whenToUse: z.string().min(10).max(400),
-  triggers: z.array(z.string().min(3).max(160)).min(1).max(8),
+  whenToUseCitations: z.array(skillCitationRef).max(4),
+  triggers: z.array(skillTrigger).min(1).max(8),
   steps: z
     .array(
       z.object({
@@ -73,11 +84,37 @@ export const skillBodySchema = z.object({
       }),
     )
     .max(12),
-  owners: z.array(z.string().max(120)).max(6),
+  owners: z.array(skillOwner).max(6),
   confidence: z.number().min(0).max(1),
   extractorNotes: z.string().max(500).nullable(),
 });
 export type SkillBody = z.infer<typeof skillBodySchema>;
+
+/** Read pre-Citation-coverage Skill versions without weakening new writes. */
+export function normalizeStoredSkillBody(value: unknown): SkillBody {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return skillBodySchema.parse(value);
+  }
+  const body = value as Record<string, unknown>;
+  const triggers = Array.isArray(body.triggers)
+    ? body.triggers.map((trigger) =>
+        typeof trigger === "string"
+          ? { phrase: trigger, citations: [] }
+          : trigger,
+      )
+    : body.triggers;
+  const owners = Array.isArray(body.owners)
+    ? body.owners.map((owner) =>
+        typeof owner === "string" ? { name: owner, citations: [] } : owner,
+      )
+    : body.owners;
+  return skillBodySchema.parse({
+    ...body,
+    whenToUseCitations: body.whenToUseCitations ?? [],
+    triggers,
+    owners,
+  });
+}
 
 // A contradiction the model detected between two sources on the same topic.
 // Each side quotes its chunk verbatim so the server can verify it.

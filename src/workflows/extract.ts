@@ -12,7 +12,6 @@ import { updateRun } from "@/lib/runs";
 type WorkflowInput = {
   workspaceId: string;
   runId: string;
-  createdBy: string;
   sourceIds: string[];
 };
 
@@ -53,7 +52,6 @@ async function extractBatchStep(input: {
 async function persistStep(input: {
   workspaceId: string;
   runId: string;
-  createdBy: string;
   sourceIds: string[];
   candidates: SkillBody[];
   modelConflicts: ExtractionConflict[];
@@ -67,7 +65,6 @@ async function persistStep(input: {
   const { proposedSkillCount, conflictCount } = await mergeAndPersist({
     workspaceId: input.workspaceId,
     runId: input.runId,
-    createdBy: input.createdBy,
     candidates: input.candidates,
     chunkToSource,
     modelConflicts: input.modelConflicts,

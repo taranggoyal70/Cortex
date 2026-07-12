@@ -10,7 +10,10 @@ import {
   skillVersions,
   sources,
 } from "@/db/schema";
-import type { SkillBody } from "@/lib/domain/skill";
+import {
+  normalizeStoredSkillBody,
+  type SkillBody,
+} from "@/lib/domain/skill";
 import { AppError } from "@/lib/errors";
 
 export async function listSkills(workspaceId: string) {
@@ -82,8 +85,14 @@ export async function getSkillDetail(
     .orderBy(desc(skillVersions.version));
 
   // Show the approved current version if set, otherwise the latest draft.
+  const normalizedVersions = versions.map((version) => ({
+    ...version,
+    body: normalizeStoredSkillBody(version.body),
+  }));
   const display =
-    versions.find((v) => v.id === skill.currentVersionId) ?? versions[0] ?? null;
+    normalizedVersions.find((v) => v.id === skill.currentVersionId) ??
+    normalizedVersions[0] ??
+    null;
 
   const citeRows = display
     ? await db
@@ -101,129 +110,12 @@ export async function getSkillDetail(
 
   return {
     skill,
-    versions,
+    versions: normalizedVersions,
     displayVersion: display
       ? { id: display.id, version: display.version, body: display.body }
       : null,
     citations: citeRows,
   };
-}
-
-export async function approveSkillVersion(input: {
-  workspaceId: string;
-  userId: string;
-  skillId: string;
-  versionId: string;
-}) {
-  const db = getDb();
-  const [version] = await db
-    .select()
-    .from(skillVersions)
-    .where(
-      and(
-        eq(skillVersions.id, input.versionId),
-        eq(skillVersions.workspaceId, input.workspaceId),
-        eq(skillVersions.skillId, input.skillId),
-      ),
-    )
-    .limit(1);
-  if (!version) throw new AppError("Version not found.", 404, "version_not_found");
-
-  // Supersede any previously-approved version, approve this one.
-  await db
-    .update(skillVersions)
-    .set({ state: "superseded" })
-    .where(
-      and(
-        eq(skillVersions.skillId, input.skillId),
-        eq(skillVersions.state, "approved"),
-      ),
-    );
-  await db
-    .update(skillVersions)
-    .set({ state: "approved", approvedBy: input.userId, approvedAt: new Date() })
-    .where(eq(skillVersions.id, input.versionId));
-  await db
-    .update(skills)
-    .set({
-      status: "approved",
-      currentVersionId: input.versionId,
-      isStale: false,
-      staleReason: null,
-      updatedAt: new Date(),
-    })
-    .where(eq(skills.id, input.skillId));
-}
-
-export async function saveSkillEdit(input: {
-  workspaceId: string;
-  userId: string;
-  skillId: string;
-  body: SkillBody;
-}) {
-  const db = getDb();
-  const [skill] = await db
-    .select()
-    .from(skills)
-    .where(and(eq(skills.id, input.skillId), eq(skills.workspaceId, input.workspaceId)))
-    .limit(1);
-  if (!skill) throw new AppError("Skill not found.", 404, "skill_not_found");
-
-  const existing = await db
-    .select({ version: skillVersions.version })
-    .from(skillVersions)
-    .where(eq(skillVersions.skillId, input.skillId));
-  const nextVersion =
-    existing.reduce((max, v) => Math.max(max, v.version), 0) + 1;
-
-  // Supersede whatever version was approved before adding the new one, so the
-  // skill never has two approved versions regardless of which one was current.
-  await db
-    .update(skillVersions)
-    .set({ state: "superseded" })
-    .where(
-      and(
-        eq(skillVersions.skillId, input.skillId),
-        eq(skillVersions.state, "approved"),
-      ),
-    );
-
-  // A human edit creates a new approved version — it becomes the current one.
-  const [version] = await db
-    .insert(skillVersions)
-    .values({
-      skillId: input.skillId,
-      workspaceId: input.workspaceId,
-      version: nextVersion,
-      state: "approved",
-      body: input.body,
-      createdBy: input.userId,
-      approvedBy: input.userId,
-      approvedAt: new Date(),
-    })
-    .returning();
-
-  await db
-    .update(skills)
-    .set({
-      name: input.body.name,
-      category: input.body.category,
-      status: "approved",
-      currentVersionId: version.id,
-      confidence: String(input.body.confidence),
-      isStale: false,
-      updatedAt: new Date(),
-    })
-    .where(eq(skills.id, input.skillId));
-
-  return version;
-}
-
-export async function archiveSkill(workspaceId: string, skillId: string) {
-  await getDb()
-    .update(skills)
-    .set({ status: "archived", updatedAt: new Date() })
-    .where(and(eq(skills.id, skillId), eq(skills.workspaceId, workspaceId)));
 }
 
 export async function listOpenConflicts(workspaceId: string) {
@@ -285,7 +177,11 @@ export async function getApprovedSkills(workspaceId: string) {
         .from(citations)
         .leftJoin(sources, eq(citations.sourceId, sources.id))
         .where(eq(citations.skillVersionId, row.versionId ?? ""));
-      return { ...row, citations: cites };
+      return {
+        ...row,
+        body: normalizeStoredSkillBody(row.body),
+        citations: cites,
+      };
     }),
   );
   return enriched;

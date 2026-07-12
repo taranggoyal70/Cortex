@@ -22,7 +22,7 @@ export default async function PlaygroundPage() {
 
   const approved = await getApprovedSkills(ctx.workspaceId);
   const examples = approved
-    .map((s) => s.body.triggers[0])
+    .map((s) => s.body.triggers[0]?.phrase)
     .filter((t): t is string => Boolean(t))
     .slice(0, 3);
 
