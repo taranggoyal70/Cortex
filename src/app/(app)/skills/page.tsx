@@ -1,13 +1,8 @@
-import { WarningIcon } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata, Route } from "next";
 import Link from "next/link";
 
 import { CreateWorkspacePrompt } from "@/components/create-workspace-prompt";
-import {
-  CategoryBadge,
-  ConfidenceBar,
-  StatusBadge,
-} from "@/components/skill-badges";
+import { SkillsExplorer } from "@/components/skills-explorer";
 import { requireWorkspace } from "@/lib/auth";
 import { AppError } from "@/lib/errors";
 import { listSkills } from "@/lib/skills";
@@ -51,37 +46,17 @@ export default async function SkillsPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {skills.map((skill) => (
-            <Link
-              key={skill.id}
-              href={`/skills/${skill.id}` as Route}
-              className="group rounded-xl border border-line bg-surface p-5 transition hover:border-line-strong"
-            >
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <CategoryBadge category={skill.category} />
-                <StatusBadge status={skill.status} />
-              </div>
-              <h2 className="font-semibold leading-snug text-paper group-hover:text-accent-light">
-                {skill.name}
-              </h2>
-              <p className="mt-1 font-mono text-[11px] text-muted">{skill.slug}</p>
-              <div className="mt-4 flex items-center justify-between">
-                {skill.confidence ? (
-                  <ConfidenceBar value={Number(skill.confidence)} />
-                ) : (
-                  <span />
-                )}
-                {skill.isStale && (
-                  <span className="inline-flex items-center gap-1 text-[11px] text-amber">
-                    <WarningIcon size={12} weight="fill" />
-                    stale
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
+        <SkillsExplorer
+          skills={skills.map((s) => ({
+            id: s.id,
+            name: s.name,
+            slug: s.slug,
+            category: s.category,
+            status: s.status,
+            confidence: s.confidence,
+            isStale: s.isStale,
+          }))}
+        />
       )}
     </main>
   );
