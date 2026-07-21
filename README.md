@@ -50,6 +50,10 @@ Every skill is a cited, versioned procedure an agent can execute:
 - `GET /api/agent/skills` — token-authed pull (`Authorization: Bearer <token>`);
   how an external agent loads the brain
 - `POST /api/agent/execute` — run a scenario against the compiled skills
+- `POST /api/mcp` — **Model Context Protocol** endpoint. Point an MCP client
+  (Claude, Codex, …) at it with `Authorization: Bearer <api token>` and the
+  agent loads the brain as live tools: `list_skills`, `get_skill`, and
+  `get_skills_file`. Token-authed and read-only, like the other agent endpoints.
 
 ## Local setup
 
