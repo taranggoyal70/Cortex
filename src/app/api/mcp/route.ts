@@ -1,3 +1,4 @@
+import pkg from "../../../../package.json";
 import { resolveApiToken } from "@/lib/api-token";
 import { buildSkillsFile, parseFormat } from "@/lib/build-skills-file";
 import { getApprovedSkills } from "@/lib/skills";
@@ -9,8 +10,8 @@ import { getApprovedSkills } from "@/lib/skills";
 // Like /api/agent/*, it authenticates by bearer token and is intentionally not
 // behind the Clerk guard (see proxy.ts). Tool calls are read-only.
 
-const PROTOCOL_VERSION = "2025-06-18";
-const SERVER_INFO = { name: "cortex", version: "0.2.0" } as const;
+const PROTOCOL_VERSION = "2025-06-18"; // MCP spec revision (protocol constant)
+const SERVER_INFO = { name: pkg.name, version: pkg.version };
 
 const TOOLS = [
   {
