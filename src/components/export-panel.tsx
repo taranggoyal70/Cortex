@@ -77,7 +77,7 @@ export function ExportPanel({ appUrl }: { appUrl: string }) {
             Create a token in Settings → API tokens, then:
           </p>
           <div className="mt-2 flex items-start gap-2">
-            <pre className="flex-1 overflow-x-auto rounded bg-ink p-2 font-mono text-[10px] leading-relaxed text-paper">
+            <pre className="min-w-0 flex-1 overflow-x-auto rounded bg-ink p-2 font-mono text-[10px] leading-relaxed text-paper">
               {curl}
             </pre>
             <button
@@ -110,7 +110,7 @@ export function ExportPanel({ appUrl }: { appUrl: string }) {
             Copy
           </button>
         </div>
-        <pre className="max-h-[70vh] overflow-auto rounded-xl border border-line bg-ink p-4 font-mono text-[11px] leading-relaxed text-paper">
+        <pre className="min-w-0 max-h-[70vh] overflow-auto whitespace-pre-wrap break-words rounded-xl border border-line bg-ink p-4 font-mono text-[11px] leading-relaxed text-paper">
           {loading ? "Loading…" : preview || "No approved skills to export yet."}
         </pre>
       </div>
