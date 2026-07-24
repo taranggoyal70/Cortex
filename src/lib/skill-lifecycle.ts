@@ -94,6 +94,14 @@ function citationClaims(body: SkillBody) {
   ];
 }
 
+function normalizeForCitationMatch(text: string): string {
+  return text
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function verifyCitations(
   store: SkillLifecycleStore,
   workspaceId: string,
@@ -120,7 +128,12 @@ async function verifyCitations(
 
   return requested.map((citation) => {
     const chunk = byId.get(citation.chunkId);
-    if (!chunk || !chunk.text.includes(citation.quote)) {
+    if (
+      !chunk ||
+      !normalizeForCitationMatch(chunk.text).includes(
+        normalizeForCitationMatch(citation.quote),
+      )
+    ) {
       throw new AppError(
         "A Skill Citation is not a verbatim quote from a Workspace Source Chunk.",
         400,
