@@ -1,4 +1,7 @@
+import { FatalError } from "workflow";
+
 import type { ExtractionConflict, SkillBody } from "@/lib/domain/skill";
+import { AppError } from "@/lib/errors";
 import {
   extractBatch,
   loadChunksForSources,
@@ -8,6 +11,19 @@ import {
   type Batch,
 } from "@/lib/extractor";
 import { updateRun } from "@/lib/runs";
+
+function errorMessage(error: unknown, fallback: string): string {
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof (error as { message: unknown }).message === "string" &&
+    (error as { message: string }).message
+  ) {
+    return (error as { message: string }).message;
+  }
+  return fallback;
+}
 
 type WorkflowInput = {
   workspaceId: string;
@@ -62,13 +78,25 @@ async function persistStep(input: {
   "use step";
 
   const chunkToSource = new Map(input.chunkToSource);
-  const { proposedSkillCount, conflictCount } = await mergeAndPersist({
-    workspaceId: input.workspaceId,
-    runId: input.runId,
-    candidates: input.candidates,
-    chunkToSource,
-    modelConflicts: input.modelConflicts,
-  });
+  let proposedSkillCount: number;
+  let conflictCount: number;
+  try {
+    ({ proposedSkillCount, conflictCount } = await mergeAndPersist({
+      workspaceId: input.workspaceId,
+      runId: input.runId,
+      candidates: input.candidates,
+      chunkToSource,
+      modelConflicts: input.modelConflicts,
+    }));
+  } catch (error) {
+    // A rejected model output (e.g. a non-verbatim citation) is a
+    // deterministic content problem, not a transient failure — retrying
+    // would just reject the same output three more times.
+    if (error instanceof AppError) {
+      throw new FatalError(error.message);
+    }
+    throw error;
+  }
 
   await markSourcesExtracted(input.workspaceId, input.sourceIds);
   await updateRun(input.runId, {
@@ -139,8 +167,10 @@ export async function extractWorkflow(input: WorkflowInput) {
       callsUsed,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown extraction error";
+    // Errors thrown by a step run in a separate invocation and cross an
+    // HTTP boundary back to this workflow, so they arrive as plain
+    // serialized objects — `instanceof Error` is unreliable here.
+    const message = errorMessage(error, "Unknown extraction error");
     await failStep(input.runId, message);
     throw error;
   }
