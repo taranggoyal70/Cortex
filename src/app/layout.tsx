@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 
+import { isClerkConfigured } from "@/lib/clerk-config";
+
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -28,31 +30,41 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const app = (
+    <>
+      {children}
+      <Toaster theme="dark" richColors toastOptions={{ className: "font-sans" }} />
+    </>
+  );
+
   return (
     <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-ink text-paper antialiased`}
       >
-        <ClerkProvider
-          appearance={{
-            variables: {
-              colorPrimary: "#8b5cf6",
-              colorBackground: "#0d1017",
-              colorForeground: "#f4f1ec",
-              colorMutedForeground: "#898b94",
-              colorInput: "#121620",
-              colorInputForeground: "#f4f1ec",
-              borderRadius: "0.625rem",
-            },
-            elements: {
-              cardBox: "shadow-2xl shadow-black/40",
-              card: "border border-white/10",
-            },
-          }}
-        >
-          {children}
-          <Toaster theme="dark" richColors toastOptions={{ className: "font-sans" }} />
-        </ClerkProvider>
+        {isClerkConfigured() ? (
+          <ClerkProvider
+            appearance={{
+              variables: {
+                colorPrimary: "#8b5cf6",
+                colorBackground: "#0d1017",
+                colorForeground: "#f4f1ec",
+                colorMutedForeground: "#898b94",
+                colorInput: "#121620",
+                colorInputForeground: "#f4f1ec",
+                borderRadius: "0.625rem",
+              },
+              elements: {
+                cardBox: "shadow-2xl shadow-black/40",
+                card: "border border-white/10",
+              },
+            }}
+          >
+            {app}
+          </ClerkProvider>
+        ) : (
+          app
+        )}
         <Analytics />
         <SpeedInsights />
       </body>

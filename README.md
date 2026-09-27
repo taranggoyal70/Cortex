@@ -46,6 +46,8 @@ Every skill is a cited, versioned procedure an agent can execute:
 
 ## Key endpoints
 
+- `GET /api/health` — deployment readiness without exposing secret values;
+  reports public-site, workspace, database, auth, and model configuration state
 - `GET /api/export?format=md|json|yaml` — session-authed download of the brain
 - `GET /api/agent/skills` — token-authed pull (`Authorization: Bearer <token>`);
   how an external agent loads the brain
@@ -67,6 +69,12 @@ pnpm install
 pnpm db:migrate
 pnpm dev
 ```
+
+The public product page also boots in a fresh checkout with no environment
+variables. It shows a setup-safe call to action instead of broken sign-in links.
+The authenticated workspace becomes available only after Clerk and Postgres are
+configured; `/api/health` makes that boundary explicit for local and hosted
+deployments.
 
 ## Configuration
 

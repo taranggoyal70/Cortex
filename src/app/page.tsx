@@ -11,6 +11,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Brand } from "@/components/brand";
+import { isClerkConfigured } from "@/lib/clerk-config";
 
 export const metadata: Metadata = {
   title: "Cortex — The Company Brain",
@@ -42,27 +43,39 @@ const features = [
 ];
 
 export default async function HomePage() {
-  const { userId } = await auth();
-  if (userId) redirect("/dashboard");
+  const clerkConfigured = isClerkConfigured();
+  if (clerkConfigured) {
+    const { userId } = await auth();
+    if (userId) redirect("/dashboard");
+  }
 
   return (
     <main className="min-h-screen bg-ink">
       <nav className="mx-auto flex h-16 max-w-[1180px] items-center justify-between px-6">
         <Brand />
-        <div className="flex items-center gap-3">
-          <Link
-            href={"/sign-in" as Route}
-            className="rounded-lg px-3 py-2 text-sm text-muted-light transition hover:bg-white/5 hover:text-paper"
-          >
-            Sign in
-          </Link>
-          <Link
-            href={"/sign-up" as Route}
+        {clerkConfigured ? (
+          <div className="flex items-center gap-3">
+            <Link
+              href={"/sign-in" as Route}
+              className="rounded-lg px-3 py-2 text-sm text-muted-light transition hover:bg-white/5 hover:text-paper"
+            >
+              Sign in
+            </Link>
+            <Link
+              href={"/sign-up" as Route}
+              className="rounded-lg bg-paper px-4 py-2 text-sm font-medium text-ink transition hover:bg-white"
+            >
+              Start building
+            </Link>
+          </div>
+        ) : (
+          <a
+            href="https://github.com/taranggoyal70/Cortex"
             className="rounded-lg bg-paper px-4 py-2 text-sm font-medium text-ink transition hover:bg-white"
           >
-            Start building
-          </Link>
-        </div>
+            View source
+          </a>
+        )}
       </nav>
 
       <section className="mx-auto max-w-[1180px] px-6 pb-16 pt-20 lg:pt-28">
@@ -82,13 +95,23 @@ export default async function HomePage() {
           run safely and consistently.
         </p>
         <div className="mt-9 flex flex-wrap gap-3">
-          <Link
-            href={"/sign-up" as Route}
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
-          >
-            Build your company brain
-            <ArrowRightIcon size={16} weight="bold" />
-          </Link>
+          {clerkConfigured ? (
+            <Link
+              href={"/sign-up" as Route}
+              className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
+            >
+              Build your company brain
+              <ArrowRightIcon size={16} weight="bold" />
+            </Link>
+          ) : (
+            <a
+              href="https://github.com/taranggoyal70/Cortex#local-setup"
+              className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-light hover:text-ink"
+            >
+              Run the full workspace
+              <ArrowRightIcon size={16} weight="bold" />
+            </a>
+          )}
         </div>
 
         <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-line-strong bg-line-strong sm:grid-cols-2 lg:grid-cols-4">

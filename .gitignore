@@ -10,3 +10,4 @@ drizzle/meta
 # Local agent-skill tooling (not product code)
 .agents/
 skills-lock.json
+/.swc
